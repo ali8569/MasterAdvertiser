@@ -53,6 +53,7 @@ public class ImageFragment extends SelectiveFragment implements MasterDownloader
 
 
     private void showImage() {
+
         Log.d("showImage",toString());
         //Picasso.get().setIndicatorsEnabled(true);
         RequestCreator requestCreator= Picasso.get()
@@ -105,6 +106,7 @@ public class ImageFragment extends SelectiveFragment implements MasterDownloader
     }
 
     private void requestFile() {
+        Log.e("Give me File","called");
         getDownloader().giveMeFile(image.geteFile(),this);
     }
 
@@ -126,6 +128,7 @@ public class ImageFragment extends SelectiveFragment implements MasterDownloader
 
     @Override
     public void onFileReadyFromCache(File file) {
+        Log.e("Give me File","Ready From Cache");
         this.file=file;
         if (started)
         showImage();
@@ -133,6 +136,7 @@ public class ImageFragment extends SelectiveFragment implements MasterDownloader
 
     @Override
     public void onFileReadyFromNet(File file,boolean cached) {
+        Log.e("Give me File","Ready from net");
         if (this.file==null || !cached){
             this.file=file;
             if (started)
@@ -143,6 +147,8 @@ public class ImageFragment extends SelectiveFragment implements MasterDownloader
     @Override
     public void onDestroy() {
         super.onDestroy();
+        //TODO image must not be null
+        //if (image!=null)
         getDownloader().removeListener(image.geteFile(),this);
     }
 }

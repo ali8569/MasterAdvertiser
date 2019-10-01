@@ -5,20 +5,14 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.util.Xml;
 import android.view.View;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 
+import ir.markazandroid.masteradvertiser.util.date.GregorianDaysOfWeek;
+import ir.markazandroid.masteradvertiser.util.date.PersianDaysOfWeek;
+import ir.markazandroid.masteradvertiser.util.date.Roozh;
 
 
 /**

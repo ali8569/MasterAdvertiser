@@ -17,6 +17,7 @@ import ir.markazandroid.masteradvertiser.signal.SignalManager;
 import ir.markazandroid.masteradvertiser.signal.SignalReceiver;
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Headers;
 import okhttp3.Response;
 
 /**
@@ -87,26 +88,32 @@ abstract class CBack implements Callback,SignalReceiver {
         }
     }
 
+
+    private Headers headers;
+
     @Override
     public void onResponse(Call call, Response response) throws IOException {
+        headers =response.headers();
         getSignalManager().sendMainSignal(new Signal("NET", Signal.DOWNLOADER_NETWORK));
-        /*for (String h:response.headers().names()){
-            Log.e("Head","name:"+h+"  value="+response.header(h));
-        }*/
-        if (response.headers().names().contains("openSocket"))
+      //  for (String h:headers.names()){
+       //     Log.e("Head","name:"+h+"  value="+headers.get(h));
+       // }
+        if (headers.names().contains("openSocket"))
             getSignalManager().sendMainSignal(new Signal("Open Socket", Signal.OPEN_SOCKET_HEADER_RECEIVED));
         try {
             if (!isCancelled) {
                 getSignalManager().sendMainSignal(new Signal("Response", Signal.SIGNAL_RESPONSE));
                 try {
+
                     if (!isSuccessfull(response.code())) return;
                     if(isRaw){
                         result(response.body().byteStream());
                         return;
                     }
 
+                    //TODO uncommnet this
                     String s = response.body().string();
-                    Log.e("Response", s);
+                    Log.e("Response", s+"\n Code="+response.code());
                     if (s.startsWith("{")) {
                         JSONObject object = new JSONObject(s);
                         if (!isSuccessfull(response.code(), object)) return;
@@ -127,7 +134,12 @@ abstract class CBack implements Callback,SignalReceiver {
         } finally {
             getSignalManager().removeReceiver(this);
             response.close();
+            headers=null;
         }
+    }
+
+    protected Headers getHeaders(){
+        return headers;
     }
 
     @Override

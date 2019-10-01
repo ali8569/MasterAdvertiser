@@ -2,7 +2,6 @@ package ir.markazandroid.masteradvertiser.object;
 
 import java.io.Serializable;
 
-import ir.markazandroid.masteradvertiser.downloader.UniqueIdentifier;
 import ir.markazandroid.masteradvertiser.network.JSONParser.annotations.JSON;
 
 /**
@@ -39,5 +38,25 @@ public class EFile implements Serializable{
 
     public void seteFileId(String eFileId) {
         this.eFileId = eFileId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof EFile)) return false;
+
+        EFile eFile = (EFile) o;
+
+        if (lastModified != eFile.lastModified) return false;
+        if (url != null ? !url.equals(eFile.url) : eFile.url != null) return false;
+        return eFileId.equals(eFile.eFileId);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = url != null ? url.hashCode() : 0;
+        result = 31 * result + eFileId.hashCode();
+        result = 31 * result + (int) (lastModified ^ (lastModified >>> 32));
+        return result;
     }
 }

@@ -27,6 +27,7 @@ public abstract class SelectiveFragment extends Fragment implements OnSelectList
     public void onSelect() {
         Log.e("cycle "+toString(),"start");
         if (!started) {
+            Log.e("cycle "+toString(),"onStart");
             start();
             started=true;
         }
@@ -36,6 +37,7 @@ public abstract class SelectiveFragment extends Fragment implements OnSelectList
     public void onDeselect() {
         Log.e("cycle "+toString(),"stop");
         if (started) {
+            Log.e("cycle "+toString(),"onStop");
             stop();
             started=false;
         }

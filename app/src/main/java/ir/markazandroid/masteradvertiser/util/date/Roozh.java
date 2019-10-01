@@ -1,4 +1,4 @@
-package ir.markazandroid.masteradvertiser.util;
+package ir.markazandroid.masteradvertiser.util.date;
 
 /*
  * Copyright 2014 Kamyar Nadimi
@@ -149,6 +149,85 @@ public class Roozh {
         return String.format("%04d-%02d-%02d", jY , jM, jD);
 
     }
+
+    public static int[] gregorianToPersianSplited(long unixTimeStamp) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(unixTimeStamp);
+
+        int jd = jG2JD(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH), 0);
+
+        int i, j;
+
+        j = 4 * jd + 139361631;
+        j = j + (4 * jd + 183187720) / 146097 * 3 / 4 * 4 - 3908;
+
+        i = (j % 1461) / 4 * 5 + 308;
+        int gM = ((i / 153) % 12) + 1;
+        int gY = j / 1461 - 100100 + (8 - gM) / 6;
+        int jM, jD;
+        int jY = gY - 621;
+        int march = 0;
+        int leap = 0;
+
+        int[] breaks = {-61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181, 1210,
+                1635, 2060, 2097, 2192, 2262, 2324, 2394, 2456, 3178};
+
+        gY = jY + 621;
+        int leapJ = -14;
+        int jp = breaks[0];
+
+        int jump = 0;
+        for (int k = 1; k <= 19; k++) {
+            int jm = breaks[k];
+            jump = jm - jp;
+            if (jY < jm) {
+                int N = jY - jp;
+                leapJ = leapJ + N / 33 * 8 + (N % 33 + 3) / 4;
+
+                if ((jump % 33) == 4 && (jump - N) == 4)
+                    leapJ = leapJ + 1;
+
+                int leapG = (gY / 4) - (gY / 100 + 1) * 3 / 4 - 150;
+
+                march = 20 + leapJ - leapG;
+
+                if ((jump - N) < 6)
+                    N = N - jump + (jump + 4) / 33 * 33;
+
+                leap = ((((N + 1) % 33) - 1) % 4);
+
+                if (leap == -1)
+                    leap = 4;
+                break;
+            }
+
+            leapJ = leapJ + jump / 33 * 8 + (jump % 33) / 4;
+            jp = jm;
+        }
+        int JDN1F = jG2JD(gY, 3, march, 0);
+        int k = jd - JDN1F;
+        if (k >= 0) {
+            if (k <= 185) {
+                jM = 1 + k / 31;
+                jD = (k % 31) + 1;
+                return new int[]{ jY , jM, jD};
+            } else {
+                k = k - 186;
+            }
+        } else {
+            jY = jY - 1;
+            k = k + 179;
+            if (leap == 1)
+                k = k + 1;
+        }
+
+        jM = 7 + k / 30;
+        jD = (k % 30) + 1;
+        return new int[]{ jY , jM, jD};
+
+
+    }
+
 
     /**
      * Calculates Gregorian and Julian calendar dates from the Julian Day number

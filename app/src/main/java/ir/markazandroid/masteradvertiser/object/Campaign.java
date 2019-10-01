@@ -14,6 +14,8 @@ public class Campaign implements Serializable {
 
     private long campaignId;
     private AndroidData androidData;
+    private long duration;
+    private String name;
 
     @JSON(classType = JSON.CLASS_TYPE_OBJECT,clazz = AndroidData.class)
     public AndroidData getAndroidData() {
@@ -31,6 +33,24 @@ public class Campaign implements Serializable {
 
     public void setCampaignId(long campaignId) {
         this.campaignId = campaignId;
+    }
+
+    @JSON
+    public long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(long duration) {
+        this.duration = duration;
+    }
+
+    @JSON
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 

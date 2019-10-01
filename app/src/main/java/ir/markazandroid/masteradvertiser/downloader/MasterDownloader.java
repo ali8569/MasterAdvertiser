@@ -176,10 +176,13 @@ public class MasterDownloader {
                     if (fileTask == null)
                         fileTask = downloadingTasks.get(new FileTask(eFile).getId());
 
-                    if (fileTask != null)
-                        fileTask.getListeners().add(fetchListener);
+                    if (fileTask != null) {
+                        if (fetchListener != null)
+                            fileTask.getListeners().add(fetchListener);
+                    }
                     else {
                         fileTask = new FileTask(eFile);
+                            if (fetchListener!=null)
                         fileTask.getListeners().add(fetchListener);
                         addToQueue(fileTask);
                     }
@@ -229,11 +232,21 @@ public class MasterDownloader {
                 transitionLock.lock();
                 downloadingTasks.remove(fileTask.getId());
                 addToQueue(fileTask);
+                return;
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } finally {
                 transitionLock.unlock();
             }
+        }
+    }
+
+    private void done(FileTask fileTask) {
+        try {
+            transitionLock.lock();
+            downloadingTasks.remove(fileTask.getId());
+        } finally {
+            transitionLock.unlock();
         }
     }
 
@@ -283,10 +296,12 @@ public class MasterDownloader {
 
             case DOWNLOAD_RESULT_CANCELLED:
                 broadcastTaskStatus(fileTask, EFILE_STATUS_CANCELED, -1, -1);
+                done(fileTask);
                 break;
 
             case DOWNLOAD_RESULT_HTTP_ERROR:
                 broadcastTaskStatus(fileTask, EFILE_STATUS_FAILED_NO_RETRY, -1, -1);
+                done(fileTask);
                 break;
 
             case DOWNLOAD_RESULT_NO_NET:
@@ -298,9 +313,11 @@ public class MasterDownloader {
 
             case DOWNLOAD_RESULT_DOWNLOADED:
                 broadcastFileReadyDownload(fileTask, true);
+                done(fileTask);
                 break;
             case DOWNLOAD_RESULT_CORRECT:
                 broadcastFileReadyDownload(fileTask, false);
+                done(fileTask);
                 break;
 
         }
@@ -385,7 +402,7 @@ public class MasterDownloader {
 
         //TODO make link
         Request.Builder request = new Request.Builder()
-                .url(NetStatics.DOMAIN+"/data/read?eFileId="+fileTask.getEFile().geteFileId())
+                .url(NetStatics.SUFFIX+"/data/read?eFileId="+fileTask.getEFile().geteFileId())
                 .get();
         File tempFile = new File(tempDir, fileTask.getId());
         boolean isResume = tempFile.exists();

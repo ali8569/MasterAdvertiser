@@ -42,7 +42,7 @@ public class DataEntity implements Serializable {
     }
 
     public void setDuration(int duration) {
-        this.duration = duration;
+        this.duration = 5;
     }
 
     @JSON
@@ -60,5 +60,31 @@ public class DataEntity implements Serializable {
 
     public void setFile(File file) {
         this.file = file;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DataEntity)) return false;
+
+        DataEntity that = (DataEntity) o;
+
+        if (order != that.order) return false;
+        if (duration != that.duration) return false;
+        if (!eFile.equals(that.eFile)) return false;
+        return dataType.equals(that.dataType);
+    }
+
+    private int random = Math.round((float) Math.random()*10000);
+
+    @Override
+    public int hashCode() {
+        return random;
+        /*int result = eFile.hashCode();
+        result = 31 * result + order;
+        result = 31 * result + duration;
+        result = 31 * result + dataType.hashCode();
+        return result;*/
     }
 }

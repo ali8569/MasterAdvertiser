@@ -20,11 +20,22 @@ import ir.markazandroid.masteradvertiser.object.EFile;
 import ir.markazandroid.masteradvertiser.object.ErrorObject;
 import ir.markazandroid.masteradvertiser.object.FieldError;
 import ir.markazandroid.masteradvertiser.object.Phone;
+import ir.markazandroid.masteradvertiser.object.SHT;
+import ir.markazandroid.masteradvertiser.object.Schedule;
+import ir.markazandroid.masteradvertiser.object.Series;
+import ir.markazandroid.masteradvertiser.object.SeriesCampaign;
+import ir.markazandroid.masteradvertiser.object.Timeline;
 import ir.markazandroid.masteradvertiser.object.User;
 import ir.markazandroid.masteradvertiser.object.Version;
+import ir.markazandroid.masteradvertiser.service.CampaignService;
+import ir.markazandroid.masteradvertiser.service.FetcherService;
+import ir.markazandroid.masteradvertiser.service.ScheduleService;
+import ir.markazandroid.masteradvertiser.service.SeriesService;
+import ir.markazandroid.masteradvertiser.service.TimelineService;
 import ir.markazandroid.masteradvertiser.signal.Signal;
 import ir.markazandroid.masteradvertiser.signal.SignalManager;
 import ir.markazandroid.masteradvertiser.signal.SignalReceiver;
+import ir.markazandroid.masteradvertiser.util.Cache;
 import ir.markazandroid.masteradvertiser.util.PreferencesManager;
 import ir.markazandroid.masteradvertiser.views.WebPageView;
 import ir.markazandroid.masteradvertiser.views.playlist.data.Data;
@@ -48,6 +59,14 @@ public class MasterAdvertiserApplication extends Application implements SignalRe
     private PoliceBridge policeBridge;
     private boolean isInternetConnected = false;
     private MasterDownloader masterDownloader;
+
+    private CampaignService campaignService;
+    private FetcherService fetcherService;
+    private ScheduleService scheduleService;
+    private TimelineService timelineService;
+    private SeriesService seriesService;
+
+    private Cache cache;
 
     @Override
     public void onCreate() {
@@ -78,6 +97,15 @@ public class MasterAdvertiserApplication extends Application implements SignalRe
                 parser.addClass(Campaign.class);
                 parser.addClass(Campaign.AndroidData.class);
                 parser.addClass(EFile.class);
+
+
+                //timeline
+                parser.addClass(Schedule.class);
+                parser.addClass(Series.class);
+                parser.addClass(SeriesCampaign.class);
+                parser.addClass(Timeline.class);
+                parser.addClass(SHT.class);
+
 
                 //PlayList
                 parser.addClass(PlayListView.Extras.class);
@@ -166,5 +194,35 @@ public class MasterAdvertiserApplication extends Application implements SignalRe
             masterDownloader.start();
         }
         return masterDownloader;
+    }
+
+    public CampaignService getCampaignService() {
+        if (campaignService==null) campaignService=new CampaignService(this);
+        return campaignService;
+    }
+
+    public FetcherService getFetcherService() {
+        if (fetcherService==null) fetcherService=new FetcherService(this);
+        return fetcherService;
+    }
+
+    public ScheduleService getScheduleService() {
+        if (scheduleService==null) scheduleService=new ScheduleService(this);
+        return scheduleService;
+    }
+
+    public TimelineService getTimelineService() {
+        if (timelineService==null) timelineService=new TimelineService(this);
+        return timelineService;
+    }
+
+    public SeriesService getSeriesService() {
+        if (seriesService==null) seriesService=new SeriesService(this);
+        return seriesService;
+    }
+
+    public Cache getCache() {
+        if (cache==null) cache=new Cache(this,getParser());
+        return cache;
     }
 }

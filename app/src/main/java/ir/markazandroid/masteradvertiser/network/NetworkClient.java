@@ -2,7 +2,9 @@ package ir.markazandroid.masteradvertiser.network;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +17,9 @@ import ir.markazandroid.police.aidl.AuthenticationDetails;
 import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Response;
 
 /**
  * Coded by Ali on 11/12/2017.
@@ -27,7 +31,7 @@ public class NetworkClient {
     private Context mContext;
 
     public NetworkClient(Context context) {
-        this.mContext=context;
+        this.mContext = context;
         cookie = new HashSet<>();
         //TODO No cookie saved
         //populateCookies();
@@ -38,31 +42,32 @@ public class NetworkClient {
                 .writeTimeout(30, TimeUnit.SECONDS)
                 .cookieJar(new CookieJar() {
 
-            @Override
-            public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-                // for(int i=0;i<cookies.size();i++) Log.e("SAVED ",cookies.get(i).name()+"="+cookies.get(i).value());
-                for (int i = 0; i < cookies.size(); i++) {
-                    Cookie cook = cookies.get(i);
-                    //TODO No cookie saved
-                   // mContext.getSharedPreferences(AdvertiserApplication.SHARED_PREFRENCES, Context.MODE_PRIVATE)
-                    //        .edit().putString("COOKIE_" + cook.name(), cook.value()).apply();
-                }
-                //TODO No cookie saved
-                //cookie.addAll(cookies);
-            }
 
-            @Override
-            public List<Cookie> loadForRequest(HttpUrl url) {
-                //for(int i=0;i<cookie.size();i++) System.err.println("SENT "+cookie.get(i).name()+"="+cookie.get(i).value());
-                AuthenticationDetails authenticationDetails = getAuthenticationDetails();
-                if (authenticationDetails!=null)
-                    cookie.add(new Cookie.Builder().name("JSESSIONID")
-                            .value(authenticationDetails.getSessionId())
-                            .domain(NetStatics.DOMAIN.substring(7).replace(":8080", ""))
-                            .build());
-                return new ArrayList<>(cookie);
-            }
-        })/*.addNetworkInterceptor(new Interceptor() {
+                    @Override
+                    public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
+                        // for(int i=0;i<cookies.size();i++) Log.e("SAVED ",cookies.get(i).name()+"="+cookies.get(i).value());
+                        for (int i = 0; i < cookies.size(); i++) {
+                            Cookie cook = cookies.get(i);
+                            //TODO No cookie saved
+                            mContext.getSharedPreferences(MasterAdvertiserApplication.SHARED_PREFRENCES, Context.MODE_PRIVATE)
+                                    .edit().putString("COOKIE_" + cook.name(), cook.value()).apply();
+                        }
+                        //TODO No cookie saved
+                        cookie.addAll(cookies);
+                    }
+
+                    @Override
+                    public List<Cookie> loadForRequest(HttpUrl url) {
+                        //for(int i=0;i<cookie.size();i++) System.err.println("SENT "+cookie.get(i).name()+"="+cookie.get(i).value());
+                        AuthenticationDetails authenticationDetails = getAuthenticationDetails();
+                        if (authenticationDetails != null)
+                            cookie.add(new Cookie.Builder().name("JSESSIONID")
+                                    .value(authenticationDetails.getSessionId())
+                                    .domain(NetStatics.DOMAIN.substring(7).replace(":8080", ""))
+                                    .build());
+                        return new ArrayList<>(cookie);
+                    }
+                })/*.addNetworkInterceptor(new Interceptor() {
                     @Override
                     public Response intercept(Chain chain) throws IOException {
                         for (String h:chain.request().headers().names()){
@@ -80,6 +85,7 @@ public class NetworkClient {
                     }
                 })*/.retryOnConnectionFailure(true).build();
     }
+
     private void populateCookies() {
         Map map = mContext.getSharedPreferences(MasterAdvertiserApplication.SHARED_PREFRENCES, Context.MODE_PRIVATE).getAll();
         for (Object o : map.entrySet()) {
@@ -93,8 +99,9 @@ public class NetworkClient {
             }
         }
     }
-    public void deleteCookies(){
-        SharedPreferences sharedPreferences =mContext.getSharedPreferences(MasterAdvertiserApplication.SHARED_PREFRENCES, Context.MODE_PRIVATE);
+
+    public void deleteCookies() {
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(MasterAdvertiserApplication.SHARED_PREFRENCES, Context.MODE_PRIVATE);
         Map map = sharedPreferences.getAll();
         for (Object o : map.entrySet()) {
             Map.Entry entry = (Map.Entry) o;
@@ -114,7 +121,7 @@ public class NetworkClient {
         return cookie;
     }
 
-    private AuthenticationDetails getAuthenticationDetails(){
-        return ((MasterAdvertiserApplication)mContext.getApplicationContext()).getPoliceBridge().getAuthenticationDetails();
+    private AuthenticationDetails getAuthenticationDetails() {
+        return ((MasterAdvertiserApplication) mContext.getApplicationContext()).getPoliceBridge().getAuthenticationDetails();
     }
 }

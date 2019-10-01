@@ -12,6 +12,7 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.Guideline;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
@@ -299,8 +300,11 @@ public class DynamicLayoutInflator {
                     String idValue = parseId(entry.getValue());
                     if (parent != null) {
                         DynamicLayoutInfo info = getDynamicLayoutInfo(parent);
-                        int newId = highestIdNumberUsed++;
+                        int newId = Math.round((float) Math.random() * 1000);
                         view.setId(newId);
+                        while (info.nameToIdNumber.containsValue(newId))
+                            newId = Math.round((float) Math.random() * 1000);
+
                         info.nameToIdNumber.put(idValue, newId);
                     }
                     break;

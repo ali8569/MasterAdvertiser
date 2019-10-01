@@ -19,4 +19,14 @@ public interface OnResultLoaded<T> {
 
         void failed(Exception e);
     }
+
+    interface AvailableListener<T> {
+        void onAvailable(T successResult);
+
+        void onNotAvailable();
+
+        void failed(Exception e);
+    }
+
+
 }

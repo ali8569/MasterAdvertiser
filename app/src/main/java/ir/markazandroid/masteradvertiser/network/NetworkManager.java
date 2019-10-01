@@ -2,7 +2,11 @@ package ir.markazandroid.masteradvertiser.network;
 
 import android.content.Context;
 
+import java.io.IOException;
+
 import ir.markazandroid.masteradvertiser.object.Campaign;
+import ir.markazandroid.masteradvertiser.object.Phone;
+import ir.markazandroid.masteradvertiser.object.Schedule;
 
 /**
  * Coded by Ali on 03/11/2017.
@@ -10,7 +14,16 @@ import ir.markazandroid.masteradvertiser.object.Campaign;
 
 public interface NetworkManager {
 
+    void getMe(OnResultLoaded.ActionListener<Phone> actionListener);
+
+    void getSchedule(long update,OnResultLoaded.AvailableListener<Schedule> result);
+
     void getCampaign(OnResultLoaded<Campaign> result);
+
+    Campaign getCampaign(long campaignId) throws IOException;
+
+
+    void login(String uuid, OnResultLoaded.ActionListener<Phone> actionListener);
 
 
 

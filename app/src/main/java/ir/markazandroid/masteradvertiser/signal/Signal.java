@@ -28,6 +28,8 @@ public class Signal implements Serializable {
     public static final int SIGNAL_CONNECTED_TO_POLICE =0x00008000;
     public static final int SIGNAL_DISCONNECTED_FROM_POLICE =0x00010000;
 
+    public static final int SIGNAL_ACTIVITY_RECREATE =0x00020000;
+
     private String msg;
     private int type;
 

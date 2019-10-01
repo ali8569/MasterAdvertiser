@@ -6,6 +6,7 @@ import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ir.markazandroid.masteradvertiser.MasterAdvertiserApplication;
+import ir.markazandroid.masteradvertiser.downloader.MasterDownloader;
 import ir.markazandroid.masteradvertiser.fragment.ImageFragment;
 import ir.markazandroid.masteradvertiser.fragment.VideoFragment;
 import ir.markazandroid.masteradvertiser.views.playlist.data.DataEntity;
@@ -35,6 +38,7 @@ public class ContentAdapter {
     private Timer timer;
     private Fragment currentFragment;
     private Handler handler;
+    private MasterDownloader masterDownloader;
 
 
     public ContentAdapter(Context context, FragmentManager fragmentManager, ArrayList<DataEntity> contents, View container) {
@@ -42,6 +46,7 @@ public class ContentAdapter {
         this.contents =new LinkedList<>(contents);
         this.container = container;
         this.handler=new Handler(context.getMainLooper());
+        masterDownloader=((MasterAdvertiserApplication)context.getApplicationContext()).getMasterDownloader();
         init();
     }
 
@@ -51,6 +56,8 @@ public class ContentAdapter {
 
         for(DataEntity data:contents){
             Fragment fragment;
+
+            masterDownloader.giveMeFile(data.geteFile(),null);
 
             switch (data.getDataType()){
                 case Image.DATA_TYPE_IMAGE:
@@ -110,14 +117,15 @@ public class ContentAdapter {
         } else {
             fragment = fragments.poll();
             fragments.add(fragment);
+            Log.e("Id",container.getId()+"");
             transaction.add(container.getId(), fragment, generateFragmentTag(content));
         }
         currentFragment=fragment;
-        //TODO warn
         if (fragmentManager.isStateSaved())
             dispose();
-        else
-            transaction.commit();
+        else {
+            transaction.commitNow();
+        }
     }
 
     private String generateFragmentTag(DataEntity content){
@@ -127,6 +135,11 @@ public class ContentAdapter {
     public void dispose(){
         if (timer!=null) timer.cancel();
         timer=null;
+
+        Log.e("Dispose",toString()+"-- "+fragmentManager.getFragments().size());
+        for (Fragment fragment:fragmentManager.getFragments()){
+            fragmentManager.beginTransaction().remove(fragment).commitNowAllowingStateLoss();
+        }
     }
 
     private void onVideoFinish(Fragment frag) {

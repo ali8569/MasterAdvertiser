@@ -1,4 +1,4 @@
-package ir.markazandroid.masteradvertiser.util;
+package ir.markazandroid.masteradvertiser.util.date;
 
 /**
  * Coded by Ali on 8/28/2018.
